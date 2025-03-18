@@ -51,48 +51,21 @@ const MapComponent = ({ filter }) => {
 
     // 🔥 Firestore에서 데이터 가져오기
     useEffect(() => {
-        const fetchPlaces = async () => {
-            try {
-                if (filter === "전체") {
-                  // 🔹 "전체" 필터가 선택되면 모든 문서(무료, 야경 등) 가져오기
-                  const placesCollection = collection(db, "places");
-                  const querySnapshot = await getDocs(placesCollection);
-                  
-                  let allPlaces = [];
-                  querySnapshot.forEach((doc) => {
-                    const data = doc.data();
-                    const placesArray = Object.keys(data).map((key) => ({
-                      id: key,
-                      ...data[key]
-                    }));
-                    allPlaces = [...allPlaces, ...placesArray];
-                  });
-        
-                  setPlaces(allPlaces);
-                } else {
-                  // 🔹 특정 필터(예: 무료, 야경) 선택 시 해당 문서만 가져오기
-                  const docRef = doc(db, "places", filter);
-                  const docSnap = await getDoc(docRef);
-        
-                  if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    const placesArray = Object.keys(data).map((key) => ({
-                      id: key,
-                      ...data[key]
-                    }));
-                    setPlaces(placesArray);
-                  } else {
-                    console.log("해당 필터의 데이터가 없습니다.");
-                    setPlaces([]);
-                  }
-                }
-              } catch (error) {
-                console.error("데이터를 불러오는 중 오류 발생:", error);
-              }
-            };
-        
-            fetchPlaces();
-          }, [filter]);
+      const fetchPlaces = async () => {
+      try {
+          const querySnapshot = await getDocs(collection(db, "places")); // Firestore에서 "places" 컬렉션 가져오기
+          const placesData = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+          }));
+          setPlaces(placesData); // 상태 업데이트
+      } catch (error) {
+          console.error("데이터를 불러오는 중 오류 발생:", error);
+      }
+      };
+
+      fetchPlaces();
+  }, []);
 
     const filteredPlaces = filter === "전체" ? places : places.filter(place => place.type === filter);
 
