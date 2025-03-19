@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
-// import { db, collection, getDocs } from "./firebase"; // Firestore 불러오기
-import { db, collection, getDocs, doc, getDoc } from "./firebase"; // Firestore 관련 함수 가져오기
+import { db, collection, getDocs} from "./firebase"; // Firestore 관련 함수 가져오기
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
@@ -13,7 +12,7 @@ const defaultIcon = new L.Icon({
     });
 
 const userIcon = new L.Icon({
-    iconUrl: "https://cdn-icons-png.flaticon.com/128/684/684809.png", // 파란색 사용자 위치 아이콘
+    iconUrl: "https://cdn-icons-png.flaticon.com/128/684/684809.png", // 사용자 위치 아이콘
     iconSize: [30, 30],
     iconAnchor: [15, 30],
     });
@@ -49,14 +48,14 @@ const MapComponent = ({ filter }) => {
     const [userLocation, setUserLocation] = useState(null);
     const [places, setPlaces] = useState([]); // Firestore에서 가져올 데이터
 
-    // 🔥 Firestore에서 데이터 가져오기
+    // Firestore에서 데이터 가져오기
     useEffect(() => {
       const fetchPlaces = async () => {
       try {
           const querySnapshot = await getDocs(collection(db, "places")); // Firestore에서 "places" 컬렉션 가져오기
           const placesData = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
+            id: doc.id,
+            ...doc.data()
           }));
           setPlaces(placesData); // 상태 업데이트
       } catch (error) {
@@ -67,8 +66,10 @@ const MapComponent = ({ filter }) => {
       fetchPlaces();
   }, []);
 
-    const filteredPlaces = filter === "전체" ? places : places.filter(place => place.type === filter);
-
+    // 수정된 필터링 방식: type이 배열이므로 includes 사용
+    const filteredPlaces = filter === "전체"
+      ? places
+      : places.filter(place => place.type && place.type.includes(filter));
 
     return (
     <MapContainer center={[37.5665, 126.9780]} zoom={12} className="leaflet-container">
