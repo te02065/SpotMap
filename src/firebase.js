@@ -1,4 +1,5 @@
 import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
 import { getFirestore, collection, getDocs, doc, getDoc } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -22,6 +23,7 @@ const firebaseConfig = {
 // Initialize Firebase
 // Firebase 초기화
 const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
 const db = getFirestore(app);
 
-export { db, collection, getDocs, doc, getDoc };
+export { db, analytics, collection, getDocs, doc, getDoc };
